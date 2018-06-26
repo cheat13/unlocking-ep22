@@ -33,7 +33,7 @@ namespace MyWeb.Controllers
         [HttpGet("{price}")]
         public Product GetByPrice(int price)
         {
-            return repo.Get(p => p.Price > 20);
+            return repo.Get(p => p.Price > price);
         }
 
         [HttpGet]

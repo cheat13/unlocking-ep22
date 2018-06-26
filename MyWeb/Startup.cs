@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using MyWeb.Repositories;
 
 namespace MyWeb
 {
@@ -21,7 +22,14 @@ namespace MyWeb
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var dbConfig = Configuration.GetSection(nameof(DatabaseConfigurations)).Get<DatabaseConfigurations>();
+            services.AddTransient<DatabaseConfigurations>(svc => dbConfig);
+            services.AddTransient<IProductRepository, ProductRepository>();
             services.AddMvc();
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("0.8.0", new Swashbuckle.AspNetCore.Swagger.Info { Title = "My API", Version = "0.8.0" });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -37,6 +45,11 @@ namespace MyWeb
             }
 
             app.UseStaticFiles();
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/0.8.0/swagger.json", "My API V. 0.8.0");
+            });
 
             app.UseMvc(routes =>
             {
